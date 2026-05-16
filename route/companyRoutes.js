@@ -3,18 +3,14 @@ const app=express.Router();
 const auth = require("../middleware/authMiddleware");
 const { createCompany, getAllCompanies, updateCompany, deleteCompany } = require("../controller/companyController");
 
-const { storage } = require('../storage/storage');
-const multer = require('multer');
 const {
   requireMultipartBoundary,
-  wrapMulter,
 } = require("../middleware/multipartUpload");
-const upload = multer({ storage });
-const uploadImage = wrapMulter(upload.single("image"));
+const { parseCompanyMultipart } = require("../middleware/companyMultipartUpload");
 
-app.post("/create", auth, requireMultipartBoundary, uploadImage, createCompany);
+app.post("/create", auth, requireMultipartBoundary, parseCompanyMultipart, createCompany);
 app.get("/all", getAllCompanies);
-app.put("/update/:id", auth, requireMultipartBoundary, uploadImage, updateCompany);
+app.put("/update/:id", auth, requireMultipartBoundary, parseCompanyMultipart, updateCompany);
 app.delete("/delete/:id", auth, deleteCompany);
 
 

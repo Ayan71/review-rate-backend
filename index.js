@@ -12,7 +12,7 @@ const connectDB = require("./config/database");
 // database connection
 connectDB();
 
-// middleware — restrict parsers so multipart bodies are only consumed by multer/busboy
+// middleware — JSON/urlencoded here; multipart is handled only on routes that parse it (e.g. company create/update).
 app.use(express.json({ type: "application/json" }));
 app.use(
   express.urlencoded({
