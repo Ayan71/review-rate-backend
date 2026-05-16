@@ -19,7 +19,7 @@ console.log("Body:", req.body);       // should show form fields
     if (req.file) {
       image = req.file.path; 
     }
-
+console.log("Parsed Image Path:", image);
     // validation
     if (!companyName || !address || !city) {
       return res.status(400).json({
