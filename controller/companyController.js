@@ -12,11 +12,6 @@ exports.createCompany = async (req, res) => {
       description,
     } = req.body;
 
-    let logo = "";
-    if (req.file?.path) {
-      logo = req.file.path;
-    }
-console.log("Parsed Image Path:", image);
     // validation
     if (!companyName || !address || !city) {
       return res.status(400).json({
@@ -32,7 +27,7 @@ console.log("Parsed Image Path:", image);
       city,
       foundedDate,
       description,
-      logo,
+
       createdBy: req.user?.userId,
     });
 

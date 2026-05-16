@@ -1,17 +1,21 @@
-const express=require("express");
-const app=express.Router();
+const express = require("express");
+const app = express.Router();
 const auth = require("../middleware/authMiddleware");
-const { createCompany, getAllCompanies, updateCompany, deleteCompany } = require("../controller/companyController");
-
 const {
-  requireMultipartBoundary,
-} = require("../middleware/multipartUpload");
-const { parseCompanyMultipart } = require("../middleware/companyMultipartUpload");
+  createCompany,
+  getAllCompanies,
+  updateCompany,
+  deleteCompany,
+} = require("../controller/companyController");
 
-app.post("/create", auth, requireMultipartBoundary, parseCompanyMultipart, createCompany);
+const { storage } = require("../storage/storage");
+const multer = require("multer");
+
+const upload = multer({ storage });
+
+app.post("/create", auth, createCompany);
 app.get("/all", getAllCompanies);
-app.put("/update/:id", auth, requireMultipartBoundary, parseCompanyMultipart, updateCompany);
+app.put("/update/:id", auth, updateCompany);
 app.delete("/delete/:id", auth, deleteCompany);
 
-
-module.exports=app;
+module.exports = app;
