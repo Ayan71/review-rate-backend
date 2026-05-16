@@ -1,7 +1,7 @@
 /**
- * Validates multipart uploads before parsers run (multer/formidable/etc).
+ * Validates multipart uploads before multer/busboy runs.
  * Wrong Content-Type (e.g. manual "multipart/form-data" without boundary in Postman)
- * breaks multipart parsers.
+ * causes busboy's "Malformed part header".
  */
 
 function multipartBoundary(headerValue) {
