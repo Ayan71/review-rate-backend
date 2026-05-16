@@ -5,11 +5,16 @@ const { createCompany, getAllCompanies, updateCompany, deleteCompany } = require
 
 const { storage } = require('../storage/storage');
 const multer = require('multer');
+const {
+  requireMultipartBoundary,
+  wrapMulter,
+} = require("../middleware/multipartUpload");
 const upload = multer({ storage });
+const uploadImage = wrapMulter(upload.single("image"));
 
-app.post("/create", auth,upload.single('image'),createCompany);
+app.post("/create", auth, requireMultipartBoundary, uploadImage, createCompany);
 app.get("/all", getAllCompanies);
-app.put("/update/:id", auth, upload.single('image'), updateCompany);
+app.put("/update/:id", auth, requireMultipartBoundary, uploadImage, updateCompany);
 app.delete("/delete/:id", auth, deleteCompany);
 
 

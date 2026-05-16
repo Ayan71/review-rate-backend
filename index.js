@@ -12,9 +12,14 @@ const connectDB = require("./config/database");
 // database connection
 connectDB();
 
-// middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// middleware — restrict parsers so multipart bodies are only consumed by multer/busboy
+app.use(express.json({ type: "application/json" }));
+app.use(
+  express.urlencoded({
+    extended: true,
+    type: "application/x-www-form-urlencoded",
+  })
+);
 
 // routes
 const authRoutes = require("./route/authRoutes");
