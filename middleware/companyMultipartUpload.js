@@ -10,7 +10,10 @@ const ALLOWED_IMAGE_MIME = /^image\/(jpeg|jpg|png)$/i;
 function mimeOrFilenameOk(imageFile) {
   const mime = imageFile.mimetype || "";
   if (ALLOWED_IMAGE_MIME.test(mime)) return true;
-  const name = imageFile.originalFilename || "";
+  const name =
+    imageFile.originalFilename ||
+    imageFile.newFilename ||
+    "";
   return /\.(jpe?g|png)$/i.test(name);
 }
 
@@ -22,7 +25,7 @@ function firstField(arr) {
 
 /**
  * Parses multipart company forms (multipart only). JSON/urlencoded skips to next().
- * Runs Cloudinary upload for field name "image"; sets req.body and req.file like multer did.
+ * Accepts logo or image file fields; uploads to Cloudinary and sets req.file like multer did.
  */
 async function parseCompanyMultipart(req, res, next) {
   const ct = req.get("Content-Type") || "";
@@ -49,10 +52,17 @@ async function parseCompanyMultipart(req, res, next) {
     }
     req.body = body;
 
-    const imageParts = files.image;
-    const imageFile = Array.isArray(imageParts)
-      ? imageParts[0]
-      : imageParts;
+    let uploadField = null;
+    for (const key of ["logo", "image"]) {
+      const parts = files[key];
+      const candidate = Array.isArray(parts) ? parts[0] : parts;
+      if (candidate?.size > 0 && candidate.filepath) {
+        uploadField = { key, file: candidate };
+        break;
+      }
+    }
+
+    const imageFile = uploadField?.file ?? null;
 
     writtenFiles = Object.values(files)
       .flat()
@@ -60,7 +70,7 @@ async function parseCompanyMultipart(req, res, next) {
 
     req.file = null;
 
-    if (imageFile && imageFile.originalFilename && imageFile.size > 0) {
+    if (imageFile && imageFile.size > 0) {
       const mime = imageFile.mimetype || "";
       if (!mimeOrFilenameOk(imageFile)) {
         return res.status(400).json({
@@ -82,8 +92,9 @@ async function parseCompanyMultipart(req, res, next) {
       });
 
       req.file = {
-        fieldname: "image",
-        originalname: imageFile.originalFilename,
+        fieldname: uploadField?.key ?? "logo",
+        originalname:
+          imageFile.originalFilename || imageFile.newFilename || "upload",
         mimetype: mime,
         path: result.secure_url,
         size: result.bytes,

@@ -3,9 +3,6 @@
 const Company = require("../model/company");
 
 exports.createCompany = async (req, res) => {
-console.log("Body:", req.body);       // should show form fields
-  console.log("File:", req.file);       // should show uploaded file info
-  console.log("User:", req.user);
   try {
     const {
       companyName,
@@ -14,10 +11,10 @@ console.log("Body:", req.body);       // should show form fields
       foundedDate,
       description,
     } = req.body;
- let image = "";
 
-    if (req.file) {
-      image = req.file.path; 
+    let logo = "";
+    if (req.file?.path) {
+      logo = req.file.path;
     }
 
     // validation
@@ -27,16 +24,15 @@ console.log("Body:", req.body);       // should show form fields
         message: "Company name, address and city are required",
       });
     }
-    
 
-    // create company
+    // Schema field is `logo` — Mongoose drops unknown keys like `image`, which left logo empty before.
     const company = await Company.create({
       companyName,
       address,
       city,
       foundedDate,
       description,
-      image,
+      logo,
       createdBy: req.user?.userId,
     });
 
@@ -77,14 +73,15 @@ exports.updateCompany = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const updatedCompany = await Company.findByIdAndUpdate(
-      id,
-      req.body,
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
+    const updates = { ...req.body };
+    if (req.file?.path) {
+      updates.logo = req.file.path;
+    }
+
+    const updatedCompany = await Company.findByIdAndUpdate(id, updates, {
+      new: true,
+      runValidators: true,
+    });
 
     if (!updatedCompany) {
       return res.status(404).json({
