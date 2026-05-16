@@ -1,8 +1,4 @@
-/**
- * Validates multipart uploads before multer/busboy runs.
- * Wrong Content-Type (e.g. manual "multipart/form-data" without boundary in Postman)
- * causes busboy's "Malformed part header".
- */
+
 
 function multipartBoundary(headerValue) {
   if (!headerValue || typeof headerValue !== "string") return null;
