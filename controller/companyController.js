@@ -3,7 +3,9 @@
 const Company = require("../model/company");
 
 exports.createCompany = async (req, res) => {
-
+console.log("Body:", req.body);       // should show form fields
+  console.log("File:", req.file);       // should show uploaded file info
+  console.log("User:", req.user);
   try {
     const {
       companyName,
@@ -12,7 +14,11 @@ exports.createCompany = async (req, res) => {
       foundedDate,
       description,
     } = req.body;
+ let image = "";
 
+    if (req.file) {
+      image = req.file.path; 
+    }
 
     // validation
     if (!companyName || !address || !city) {
@@ -21,12 +27,7 @@ exports.createCompany = async (req, res) => {
         message: "Company name, address and city are required",
       });
     }
-     let image = "";
-
-    if (req.file) {
-      image = req.file.path; 
-    }
-  
+    
 
     // create company
     const company = await Company.create({

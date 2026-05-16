@@ -7,7 +7,7 @@ const { storage } = require('../storage/storage');
 const multer = require('multer');
 const upload = multer({ storage });
 
-app.post("/create", auth,upload.none(),createCompany);
+app.post("/create", auth,upload.single('image'),createCompany);
 app.get("/all", getAllCompanies);
 app.put("/update/:id", auth, upload.single('image'), updateCompany);
 app.delete("/delete/:id", auth, deleteCompany);
